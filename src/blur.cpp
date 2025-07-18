@@ -617,6 +617,10 @@ void BlurEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::
 
 bool BlurEffect::shouldBlur(const EffectWindow *w, int mask, const WindowPaintData &data)
 {
+        // Exclude windows with 0% opacity
+    if (w->opacity() == 0.0 || data.opacity() == 0.0) {
+        return false;
+    }
     const bool hasForceBlurRole = w->data(WindowForceBlurRole).toBool();
     if ((effects->activeFullScreenEffect() && !hasForceBlurRole) || w->isDesktop()) {
         return false;

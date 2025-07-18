@@ -311,6 +311,9 @@ void BlurEffect::updateBlurRegion(EffectWindow *w, bool geometryChanged)
 
 bool BlurEffect::hasStaticBlur(EffectWindow *w)
 {
+    if (w->opacity() == 0.0) {
+        return false;
+    }
     if (!m_settings.staticBlur.enable) {
         return false;
     }

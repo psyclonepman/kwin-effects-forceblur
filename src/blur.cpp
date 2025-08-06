@@ -517,6 +517,12 @@ void BlurEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::
     // in case this window has regions to be blurred
     const QRegion blurArea = blurRegion(w).translated(w->pos().toPoint());
 
+    // Prevent blur for fully transparent windows
+    if (w->opacity() == 0.0) {
+        effects->prePaintWindow(w, data, presentTime);
+        return;
+    }
+
     bool staticBlur = hasStaticBlur(w) && m_staticBlurTextures.contains(m_currentScreen) && !blurArea.isEmpty();
     if (staticBlur) {
         if (!m_settings.general.windowOpacityAffectsBlur) {
@@ -744,6 +750,10 @@ GLTexture *BlurEffect::ensureNoiseTexture()
 
 void BlurEffect::blur(BlurRenderData &renderInfo, const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const QRegion &region, WindowPaintData &data)
 {
+    // Prevent blur for fully transparent windows
+    if (w && w->opacity() == 0.0) {
+        return;
+    }
     // Compute the effective blur shape. Note that if the window is transformed, so will be the blur shape.
     QRegion blurShape = w ? blurRegion(w).translated(w->pos().toPoint()) : region;
     if (data.xScale() != 1 || data.yScale() != 1) {
